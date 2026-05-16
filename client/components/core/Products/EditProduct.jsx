@@ -29,7 +29,6 @@ function EditProduct() {
       setLoading(true);
 
       const result = await getProductDetails(productId, token);
-      console.log("EDIT PRODUCT RESULT:", result);
 
       if (result) {
         dispatch(setEditProduct(true));

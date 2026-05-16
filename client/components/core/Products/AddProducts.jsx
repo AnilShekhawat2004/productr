@@ -172,7 +172,6 @@ function AddProducts() {
     navigate("/product");
   };
 
-  console.log("REDUX PRODUCT:", product);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-[2px] p-3">
