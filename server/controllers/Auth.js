@@ -70,45 +70,32 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     const matchPassword = await bcrypt.compare(password, user.password);
     if (!matchPassword) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    await OTP.deleteMany({ email });
+    res.status(200).json({ success: true, message: "OTP sent" });
 
+    await OTP.deleteMany({ email });
     const otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false,
     });
-
     await OTP.create({ email, otp });
 
-    return res.status(200).json({
-      success: true,
-      message: "OTP sent",
-    });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    if (!res.headersSent) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
   }
 };
-
 exports.resendOtp = async (req, res) => {
   try {
     const { email } = req.body;
