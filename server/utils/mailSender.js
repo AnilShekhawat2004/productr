@@ -9,7 +9,19 @@ const transporter = nodemailer.createTransport({
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },
-  pool: true,
+  pool: true,          
+  maxConnections: 5,   
+  maxMessages: 100,    
+  rateDelta: 1000,    
+  rateLimit: 5,         
+});
+
+transporter.verify((error) => {
+  if (error) {
+    console.error("Mail transporter error:", error);
+  } else {
+    console.log("Mail server is ready");
+  }
 });
 
 const mailSender = async (email, title, body) => {
