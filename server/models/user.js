@@ -16,15 +16,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
     password: {
       type: String,
       required: true,
     },
     image: {
-      type: String,
-    },
-    token: {
       type: String,
     },
     product: [

@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
 
     const matchPassword = await bcrypt.compare(password, user.password);
     if (!matchPassword) {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
@@ -125,7 +125,7 @@ exports.resendOtp = async (req, res) => {
     const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
 
     if (recentOtp) {
-      const diff = Date.now() - recentOtp.createdAt;
+      const diff = Date.now() - new Date(recentOtp.createdAt).getTime(); 
 
       if (diff < 20000) {
         return res.status(400).json({
@@ -203,8 +203,8 @@ exports.verifyOtp = async (req, res) => {
     res.cookie("token", token, {
       expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      // secure: true,
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "None",
     });
 
     user.password = undefined;

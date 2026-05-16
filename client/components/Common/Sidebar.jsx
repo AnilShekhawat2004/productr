@@ -4,7 +4,7 @@ import { IoHome } from "react-icons/io5";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiLogOut } from "react-icons/fi";
-import { logout } from "../../services/operations/authAPI";
+import { logoutUser } from "../../services/operations/authAPI";
 import { useDispatch } from "react-redux";
 
 export default function Sidebar() {
@@ -62,7 +62,7 @@ export default function Sidebar() {
 
         <div
           onClick={() => {
-            dispatch(logout(navigate));
+            dispatch(logoutUser(navigate));
           }}
           className="px-3 py-2 ml-4 mr-4 mt-10 flex flex-row gap-2 justify-center items-center bg-[#0f172a] rounded-lg cursor-pointer"
         >

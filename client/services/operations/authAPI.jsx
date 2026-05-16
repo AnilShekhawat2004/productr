@@ -111,6 +111,7 @@ export function verifyOTP(email, otp, navigate) {
 
       localStorage.setItem("token", JSON.stringify(response.data.token));
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.removeItem("email");
       navigate("/home");
     } catch (error) {
       console.log("Verify OTP API Error.......", error);
@@ -121,7 +122,7 @@ export function verifyOTP(email, otp, navigate) {
   };
 }
 
-export function logout(navigate) {
+export function logoutUser(navigate) {
   return (dispatch) => {
     dispatch(setToken(null));
     dispatch(setUser(null));

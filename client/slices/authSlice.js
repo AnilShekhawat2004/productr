@@ -8,7 +8,7 @@ const initialState = {
   token: localStorage.getItem("token")
     ? JSON.parse(localStorage.getItem("token"))
     : null,
-  email: null,
+  email: localStorage.getItem("email") || null,
   error: null,
 };
 
@@ -27,7 +27,8 @@ const authSlice = createSlice({
       localStorage.setItem("token", JSON.stringify(action.payload));
     },
     setEmail(state, action) {
-        state.email = action.payload
+      state.email = action.payload;
+      localStorage.setItem("email", action.payload);
     },
     setError(state, action) {
       state.error = action.payload;
