@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const mailSender = require("../utils/mailSender");
-const emailTemplate = require("../mail/templates/otp");
+const { otp: emailTemplate } = require("../mail/templates/otp");
 const OTPSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -34,7 +34,6 @@ OTPSchema.pre("save", async function (next) {
   if (this.isNew) {
     await sendVerificationEmail(this.email, this.otp);
   }
-  next();
 });
 
 const OTP = mongoose.model("OTP", OTPSchema);

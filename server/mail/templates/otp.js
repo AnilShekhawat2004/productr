@@ -1,4 +1,4 @@
-exports.otp = (otp, email) => {
+exports.otp = (otp) => {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
