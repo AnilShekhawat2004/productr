@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 const mailSender = require("../utils/mailSender");
-const { otp: emailTemplate } = require("../mail/templates/otp");
+const emailTemplate = require("../mail/templates/otp");
 const OTPSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
   otp: {
     type: String,
@@ -20,20 +19,22 @@ const OTPSchema = new mongoose.Schema({
 
 async function sendVerificationEmail(email, otp) {
   try {
-    const mailResponse = await mailSender(email, "Verification Code", emailTemplate(otp));
-    if (!mailResponse) {
-      throw new Error("Mail sending failed silently");
-    }
+    const mailResponse = await mailSender(
+      email,
+      "OTP Verification",
+      emailTemplate(otp),
+    );
   } catch (error) {
     console.log("Error occurred while sending email: ", error);
     throw error;
   }
 }
 
-OTPSchema.pre("save", async function () {
+OTPSchema.pre("save", async function (next) {
   if (this.isNew) {
     await sendVerificationEmail(this.email, this.otp);
   }
+  next();
 });
 
 const OTP = mongoose.model("OTP", OTPSchema);

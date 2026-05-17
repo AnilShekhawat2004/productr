@@ -69,33 +69,53 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    const matchPassword = await bcrypt.compare(password, user.password);
-    if (!matchPassword) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
-
-    res.status(200).json({ success: true, message: "OTP sent" });
 
     await OTP.deleteMany({ email });
+
     const otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false,
     });
+
     await OTP.create({ email, otp });
 
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+    });
   } catch (error) {
     console.error(error);
-    if (!res.headersSent) {
-      return res.status(500).json({ success: false, message: error.message });
-    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Login failed",
+    });
   }
 };
+
 exports.resendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -112,9 +132,9 @@ exports.resendOtp = async (req, res) => {
     const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
 
     if (recentOtp) {
-      const diff = Date.now() - new Date(recentOtp.createdAt).getTime(); 
+      const diff = Date.now() - new Date(recentOtp.createdAt).getTime();
 
-      if (diff < 20000) {
+      if (diff < 60000) {
         return res.status(400).json({
           success: false,
           message: "Please wait before requesting another OTP",
@@ -186,6 +206,8 @@ exports.verifyOtp = async (req, res) => {
         expiresIn: "7d",
       },
     );
+
+    const isProd = process.env.NODE_ENV === "production";
 
     res.cookie("token", token, {
       expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),

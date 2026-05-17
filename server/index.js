@@ -12,7 +12,7 @@ const authRoute = require("./routes/auth")
 const productRoute = require("./routes/product")
 
 // Load config from file
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
 // Connect to the database
 database.connect();
