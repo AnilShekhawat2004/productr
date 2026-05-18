@@ -8,7 +8,7 @@ function VerfiyOtp() {
   const { email } = useSelector((state) => state.auth);
 
   const [otpArray, setOtpArray] = useState(["", "", "", "", "", ""]);
-  const [timer, setTimer] = useState(20);
+  const [timer, setTimer] = useState(60);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();

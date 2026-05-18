@@ -145,7 +145,7 @@ exports.resendOtp = async (req, res) => {
     if (recentOtp) {
       const diff = Date.now() - new Date(recentOtp.createdAt).getTime();
 
-      if (diff < 60000) {
+      if (diff < 10000) {
         return res.status(400).json({
           success: false,
           message: "Please wait before requesting another OTP",
@@ -162,6 +162,16 @@ exports.resendOtp = async (req, res) => {
     });
 
     await OTP.create({ email, otp });
+
+    try {
+      console.log("📧 Sending resend OTP email...");
+
+      await mailSender(email, "OTP Verification", emailTemplate(otp));
+
+      console.log("✅ Resend email sent");
+    } catch (err) {
+      console.log("❌ Email error:", err);
+    }
 
     return res.status(200).json({
       success: true,
@@ -196,7 +206,16 @@ exports.verifyOtp = async (req, res) => {
       });
     }
 
-    if (recentOtp.otp !== otp) {
+    const diff = Date.now() - new Date(recentOtp.createdAt).getTime();
+
+    if (diff > 5 * 60 * 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired",
+      });
+    }
+
+    if (String(recentOtp.otp) !== String(otp)) {
       return res.status(400).json({
         success: false,
         message: "Invalid OTP",
@@ -207,6 +226,13 @@ exports.verifyOtp = async (req, res) => {
 
     const user = await User.findOne({ email });
 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     const token = jwt.sign(
       {
         id: user._id,
@@ -215,7 +241,7 @@ exports.verifyOtp = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
-      },
+      }
     );
 
     const isProd = process.env.NODE_ENV === "production";
@@ -223,8 +249,8 @@ exports.verifyOtp = async (req, res) => {
     res.cookie("token", token, {
       expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      secure: isProd,
+      sameSite: isProd ? "None" : "Lax",
     });
 
     user.password = undefined;
