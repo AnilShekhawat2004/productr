@@ -3,7 +3,7 @@
 A full-stack **product management platform** where users can securely create, manage, publish, and unpublish products.  
 The application includes **OTP-based email verification**, secure authentication, and a complete dashboard for managing products efficiently.
 
-🔗 **Live Website:** https://your-live-link.com/
+🔗 **Live Website:** https://productr-rho.vercel.app
 
 ---
 
@@ -244,7 +244,7 @@ Created by **Anil Singh Shekhawat**
 
 Full-Stack Web Developer
 
-🔗 Live Project: https://your-live-link.com/
+🔗 Live Project: https://productr-rho.vercel.app
 
 ---
 
