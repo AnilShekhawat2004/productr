@@ -1,27 +1,21 @@
-const { config } = require("dotenv");
-const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
 
-require("dotenv").config();
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const mailSender = async (email, title, body) => {
   try {
-    let transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
-    });
+    const msg = {
+      to: email,
+      from: process.env.MAIL_USER,
+      subject: title,
+      html: body,
+    };
 
-    let info = await transporter.sendMail({
-      from: "Productr",
-      to: `${email}`,
-      subject: `${title}`,
-      html: `${body}`,
-    });
-    return info;
+    const response = await sgMail.send(msg);
+    return response;
   } catch (error) {
-    console.log(error.message);
+    console.log(" SendGrid Error:", error.response?.body || error.message);
+    throw error;
   }
 };
 
