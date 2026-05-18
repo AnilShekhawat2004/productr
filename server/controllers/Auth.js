@@ -4,6 +4,7 @@ const User = require("../models/user");
 const OTP = require("../models/otp");
 const mailSender = require("../utils/mailSender");
 const otpGenerator = require("otp-generator");
+const { otp: emailTemplate } = require("../mail/templates/otp");
 
 require("dotenv").config();
 
@@ -101,6 +102,16 @@ exports.login = async (req, res) => {
     });
 
     await OTP.create({ email, otp });
+
+    try {
+      console.log("📧 Sending email...");
+
+      await mailSender(email, "OTP Verification", emailTemplate(otp));
+
+      console.log("✅ Email sent");
+    } catch (err) {
+      console.log("❌ Email error:", err);
+    }
 
     return res.status(200).json({
       success: true,
